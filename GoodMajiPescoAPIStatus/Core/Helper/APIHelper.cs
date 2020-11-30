@@ -108,20 +108,6 @@ public class APIHelper
                     return new RVal { RStatus = false, RMsg = ResponseData };
             }
         }
-
-        
     }
-    public async Task<RVal> GetResponseMsg(HttpResponseMessage response)
-    {
-        var result = await response.Content.ReadAsStringAsync();
-        switch (response.StatusCode)
-        {
-            case HttpStatusCode.OK:
-                return new RVal { RStatus = true, RMsg = result };
-            case HttpStatusCode.BadRequest:
-                return new RVal { RStatus = false, RMsg = result };
-            default:
-                return new RVal { RStatus = false, RMsg = result };
-        }
-    }
+    
 }

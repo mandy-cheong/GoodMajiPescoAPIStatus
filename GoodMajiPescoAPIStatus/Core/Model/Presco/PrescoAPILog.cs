@@ -15,7 +15,7 @@ public class PrescoAPILog
         //
     }
 
-
+    public Guid SysId { get; set; }
     public string URL { get; set; }
     public string  RequestData { get; set; }
     public string ResponseData { get; set; }

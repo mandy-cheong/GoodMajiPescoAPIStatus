@@ -97,11 +97,12 @@ public class PrescoService
         var url = _url + "/api/shipment/status";
         var helper = new APIHelper { Url = url, RequestData = JsonConvert.SerializeObject(request), ContentType= "application/json" };
         var rval = helper.PostApi();
+        AddLog(helper);
 
         if (rval.RStatus)
         {
             var response = JsonConvert.DeserializeObject<List<ShipStatus>>(rval.RMsg);
-            return (response);
+            return response;
         }
         else
         {
@@ -114,7 +115,23 @@ public class PrescoService
         var sql = "SELECT ST69 As ShipNo FROM Shipment  INNER JOIN PrescoOrderLog ON Shipment.ST69 = PrescoOrderLog.GMShipID WHERE Shipment.St12>5";
         return _dapperHelper.Query<ShipStatusRequest>(sql).ToList();
     }
-
+    private bool AddLog(APIHelper helper)
+    {
+        PrescoAPILog prescoAPILog = MapAPILog(helper);
+        var cmd = SqlExtension.GetInsertSqlCmd("PrescoAPILog", prescoAPILog);
+        return SqlHelper.executeNonQry(cmd);
+    }
+    private PrescoAPILog MapAPILog(APIHelper helper)
+    {
+        return new PrescoAPILog
+        {
+            SysId = Guid.NewGuid(),
+            CDate = DateTime.Now,
+            URL = helper.Url,
+            RequestData = helper.RequestData,
+            ResponseData = helper.ResponseData
+        };
+    }
 }
 
 
