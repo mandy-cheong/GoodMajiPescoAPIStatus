@@ -17,8 +17,8 @@ using System.Web;
 /// </summary>
 public class PrescoService
 {
-    //private readonly string _url = "https://cbec-test.sp88.tw";
-    private readonly string _url = "https://cbec.sp88.tw";
+    private readonly string _url = "https://cbec-test.sp88.tw";
+    //private readonly string _url = "https://cbec.sp88.tw";
     private readonly APIHelper _apiHelper;
     private readonly DapperHelper _dapperHelper;
     

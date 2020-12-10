@@ -12,12 +12,11 @@ namespace GoodMajiPescoAPIStatus
         static void Main(string[] args)
         {
             var service = new PrescoService();
-            var shipstatusRequest = new List<ShipStatusRequest>(); //service.GetShipStatusRequests();
-            shipstatusRequest.Add(new ShipStatusRequest { ShipNo = "GMJI7110052847001" });
+            var shipstatusRequest = service.GetShipStatusRequests();
+            //shipstatusRequest.Add(new ShipStatusRequest { ShipNo = "GMJI7110052847001" });
             var updateresult = service.UpdateShipmentStatus(shipstatusRequest);
 
             Console.WriteLine(updateresult);
-            Console.ReadLine();
         }
     }
 }
