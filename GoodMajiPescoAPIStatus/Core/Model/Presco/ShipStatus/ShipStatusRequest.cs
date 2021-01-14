@@ -10,4 +10,11 @@ namespace goodmaji
     {
         public string ShipNo { get; set; }
     }
+
+    public class PrescoShipment {
+        public string  GMShipID { get; set; }
+        public string  PrescoShipID { get; set; }
+
+        public string ParcelNo { get; set; }
+    }
 }

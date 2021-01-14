@@ -75,6 +75,7 @@
     <Compile Include="Core\Model\Presco\ShipStatus\ShipStatusResponse.cs" />
     <Compile Include="Core\Model\RVal.cs" />
     <Compile Include="Core\Model\Shipment.cs" />
+    <Compile Include="Core\Model\ShipmentHistory.cs" />
     <Compile Include="Core\PRESCOAPI.cs" />
     <Compile Include="Core\SqlHelper.cs" />
     <Compile Include="Core\SqlLib-v3.cs" />

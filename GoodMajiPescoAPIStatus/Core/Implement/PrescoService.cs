@@ -1,4 +1,5 @@
 ﻿using goodmaji;
+using GoodMajiPescoAPIStatus.Core.Model;
 using Newtonsoft.Json;
 using SqlLib;
 using System;
@@ -17,7 +18,7 @@ using System.Web;
 /// </summary>
 public class PrescoService
 {
-    private readonly string _url = "https://cbec-test.sp88.tw";
+    public string _url = "https://test-cbec.sp88.tw";
     //private readonly string _url = "https://cbec.sp88.tw";
     private readonly APIHelper _apiHelper;
     private readonly DapperHelper _dapperHelper;
@@ -31,21 +32,26 @@ public class PrescoService
         _dapperHelper = new DapperHelper();
     }
 
-    public int UpdateShipmentStatus(List<ShipStatusRequest> shipStatusRequests)
+    public int UpdateShipmentStatus(List<PrescoShipment> shipStatusRequests)
     {
         var updatelist = GetUpdateShipments(shipStatusRequests);
         var updateCmd = new List<SqlCommand>();
 
-        foreach (var shipment in updatelist)
+        foreach (var shiphistory in updatelist)
         {
-            updateCmd.Add(SqlExtension.GetUpdateSqlCmd("Shipment", shipment, new List<string> { "ST69" }, "ST69=@ST69", null));
+            var shipment = new Shipment {ST12= shiphistory.SSH05, ST02=shiphistory.SSH03 };
+            updateCmd.Add(SqlExtension.GetUpdateSqlCmd("Shipment", shipment, new List<string> { "ST02", "ST03","ST13" }, "ST02=@ST02", null));
+            updateCmd.Add(SqlExtension.GetInsertSqlCmd("ShipmentSTHistory", shiphistory));
         }
         return SqlDbmanager.ExecuteNonQryMutiSqlCmd(updateCmd);
     }
-    public List<Shipment> GetUpdateShipments(List<ShipStatusRequest> shipStatusRequests)
+    public List<ShipmentHistory> GetUpdateShipments(List<PrescoShipment> prescoShipments)
     {
+        var shipStatusRequests = prescoShipments
+                                  .Select(x => new ShipStatusRequest() { ShipNo = x.PrescoShipID })
+                                  .ToList();
         var prescoStatus = GetStatusFromPresco(shipStatusRequests);
-        var updateList = new List<Shipment>();
+        var updateList = new List<ShipmentHistory>();
         foreach(var status in prescoStatus.ShipStatuses)
         {
             foreach(var tracking in status.Tracking)
@@ -53,8 +59,10 @@ public class PrescoService
                 var goodmajiStatus = MapGoodMajiStatus(tracking.Status);
                 if (goodmajiStatus > 0)
                 {
-                    var shipment = new Shipment { ST12 = goodmajiStatus, ST69 = status.ShipNo };
+                    var prescoshipment = prescoShipments.Where(x => x.PrescoShipID == status.ShipNo).FirstOrDefault();
+                    var shipment = new ShipmentHistory { SSH04 = prescoshipment.ParcelNo, SSH05=goodmajiStatus, SSH02 =tracking.Date, SSH03= prescoshipment.GMShipID , SSH25=DateTime.Now, SSH24=tracking.Status.ToString()};
                     updateList.Add(shipment);
+
                 }
             }
         }
@@ -110,10 +118,12 @@ public class PrescoService
         }
     }
 
-    public List<ShipStatusRequest>GetShipStatusRequests()
+    public List<PrescoShipment>GetShipStatusRequests()
     {
-        var sql = "SELECT ST69 As ShipNo FROM Shipment  INNER JOIN PrescoOrderLog ON Shipment.ST69 = PrescoOrderLog.GMShipID WHERE Shipment.St12>5";
-        return _dapperHelper.Query<ShipStatusRequest>(sql).ToList();
+        var sql = "SELECT PrescoOrderLog.PrescoShipID ,PrescoOrderLog.GMShipID, Shipment.ST03 AS ParcelNo FROM Shipment  " +
+            "INNER JOIN PrescoOrderLog ON Shipment.ST02 = PrescoOrderLog.GMShipID " +
+            "WHERE Shipment.St12>5 AND PrescoOrderLog.Status=1 ";
+        return _dapperHelper.Query<PrescoShipment>(sql).ToList();
     }
     private bool AddLog(APIHelper helper)
     {
