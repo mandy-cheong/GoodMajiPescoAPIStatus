@@ -1,4 +1,5 @@
 ﻿using goodmaji;
+using GoodMajiPescoAPIStatus.Core.Logger;
 using GoodMajiPescoAPIStatus.Core.Model;
 using Newtonsoft.Json;
 using SqlLib;
@@ -98,24 +99,28 @@ public class PrescoService
                 return 0;
         }
     }
-    
 
-    private List<ShipStatus> GetStatus( List<ShipStatusRequest> request)
+
+    private List<ShipStatus> GetStatus(List<ShipStatusRequest> request)
     {
         var url = _url + "/api/shipment/status";
-        var helper = new APIHelper { Url = url, RequestData = JsonConvert.SerializeObject(request), ContentType= "application/json" };
-        var rval = helper.PostApi();
-        AddLog(helper);
+        var helper = new APIHelper { Url = url, RequestData = JsonConvert.SerializeObject(request), ContentType = "application/json" };
+        var rval = new RVal();
+        var response = new List<ShipStatus>();
 
-        if (rval.RStatus)
+        try
         {
-            var response = JsonConvert.DeserializeObject<List<ShipStatus>>(rval.RMsg);
-            return response;
+            rval = helper.PostApi();
+            AddLog(helper);
+
+            if (rval.RStatus)
+                response = JsonConvert.DeserializeObject<List<ShipStatus>>(rval.RMsg);
         }
-        else
+        catch (Exception ex)
         {
-            return new List<ShipStatus>();
+            Logger.AddLog(rval.RMsg, ex.Message);
         }
+        return response;
     }
 
     public List<PrescoShipment>GetShipStatusRequests()

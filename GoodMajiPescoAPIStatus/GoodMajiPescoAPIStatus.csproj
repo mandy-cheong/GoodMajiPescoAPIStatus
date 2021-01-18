@@ -70,6 +70,7 @@
     <Compile Include="Core\Helper\APIHelper.cs" />
     <Compile Include="Core\Helper\DapperHelper.cs" />
     <Compile Include="Core\Implement\PrescoService.cs" />
+    <Compile Include="Core\Logger\Logger.cs" />
     <Compile Include="Core\Model\Presco\PrescoAPILog.cs" />
     <Compile Include="Core\Model\Presco\ShipStatus\ShipStatusRequest.cs" />
     <Compile Include="Core\Model\Presco\ShipStatus\ShipStatusResponse.cs" />
