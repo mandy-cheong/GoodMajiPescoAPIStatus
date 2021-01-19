@@ -20,7 +20,7 @@ using System.Web;
 public class PrescoService
 {
     public string _url = "https://test-cbec.sp88.tw";
-    //private readonly string _url = "https://cbec.sp88.tw";
+   // private readonly string _url = "https://cbec.sp88.tw";
     private readonly APIHelper _apiHelper;
     private readonly DapperHelper _dapperHelper;
     
@@ -42,9 +42,18 @@ public class PrescoService
         {
             var shipment = new Shipment {ST12= shiphistory.SSH05, ST02=shiphistory.SSH03 };
             updateCmd.Add(SqlExtension.GetUpdateSqlCmd("Shipment", shipment, new List<string> { "ST02", "ST03","ST13" }, "ST02=@ST02", null));
-            updateCmd.Add(SqlExtension.GetInsertSqlCmd("ShipmentSTHistory", shiphistory));
+            updateCmd.Add(InsertShipmentHistory(shiphistory));
         }
         return SqlDbmanager.ExecuteNonQryMutiSqlCmd(updateCmd);
+    }
+
+    private SqlCommand InsertShipmentHistory(ShipmentHistory shiphistory)
+    {
+        var cmd = SqlExtension.GetInsertSqlCmd("ShipmentSTHistory", shiphistory);
+        //SSH24.SSH05,SSH03
+        cmd.CommandText = @"IF NOT EXISTS(SELECT SSH03 FROM ShipmentSTHistory WHERE SSH24= @SSH24 AND SSH05=@SSH05 AND SSH03=@SSH03) 
+                            BEGIN "+ SqlExtension.GetInsertStr("ShipmentSTHistory", shiphistory) + " END ";
+        return cmd;
     }
     public List<ShipmentHistory> GetUpdateShipments(List<PrescoShipment> prescoShipments)
     {
@@ -127,7 +136,7 @@ public class PrescoService
     {
         var sql = "SELECT PrescoOrderLog.PrescoShipID ,PrescoOrderLog.GMShipID, Shipment.ST03 AS ParcelNo FROM Shipment  " +
             "INNER JOIN PrescoOrderLog ON Shipment.ST02 = PrescoOrderLog.GMShipID " +
-            "WHERE Shipment.St12>5 AND PrescoOrderLog.Status=1 ";
+            "WHERE Shipment.St12 BETWEEN 5 AND 7  AND PrescoOrderLog.Status=1 ";
         return _dapperHelper.Query<PrescoShipment>(sql).ToList();
     }
     private bool AddLog(APIHelper helper)

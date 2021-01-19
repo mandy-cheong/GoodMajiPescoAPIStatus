@@ -20,7 +20,7 @@ namespace goodmaji
         //測試
         public string _url = "https://test-cbec.sp88.tw";
         //正式
-        // public string _url = "https://cbec.sp88.tw";
+         //public string _url = "https://cbec.sp88.tw";
         public PRESCOAPI()
         {
 
@@ -146,7 +146,7 @@ namespace goodmaji
                 //測試
                 password = "wJlxyJEDMWhmyAKASLcp",
                 //正式
-                //password = "2ttU8T3Ic6JLkMXxRelX",
+               // password = "2ttU8T3Ic6JLkMXxRelX",
             };
             var accountJSON = JsonConvert.SerializeObject(ac);
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
