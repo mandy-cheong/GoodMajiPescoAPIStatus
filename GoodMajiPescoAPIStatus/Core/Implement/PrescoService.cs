@@ -19,11 +19,12 @@ using System.Web;
 /// </summary>
 public class PrescoService
 {
-    public string _url = "https://test-cbec.sp88.tw";
+   // public string _url = "https://test-cbec.sp88.tw";
    // private readonly string _url = "https://cbec.sp88.tw";
+
     private readonly APIHelper _apiHelper;
     private readonly DapperHelper _dapperHelper;
-    
+    public string _url = System.Configuration.ConfigurationManager.AppSettings["prescourl"];
     public PrescoService()
     {
         //
